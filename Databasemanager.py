@@ -60,20 +60,5 @@ def login(message_data):
     except TypeError:
         return False
 
-def fetch_passcode(username, passcode):
-    c, conn = connect_to_database()
-    c.execute("SELECT Passcode from Accounts WHERE Username=?", (username,))
-    hashed_passcode = c.fetchone()[0]
-    if hashed_passcode == 0:
-        return 'first time'
-    return bcrypt.checkpw(str(passcode).encode(), hashed_passcode)
 
-def insert_passcode(username, passcode):
-    c, conn = connect_to_database()
-    hashed_passcode = bcrypt.hashpw(passcode.encode(), bcrypt.gensalt())
-    c.execute("UPDATE Accounts SET Passcode = ? WHERE username = ?", (hashed_passcode, username))
-    conn.commit()
-    conn.close()
-    print("Passcode registered successfully ")
-    return
 

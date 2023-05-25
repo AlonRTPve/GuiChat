@@ -21,25 +21,31 @@ def handle_client(conn, addr):
             connected_clients.remove(conn)
             print(f"[SERVER] {addr[0]}:{str(addr[1])} has disconnected from the server")
             print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1} ")
+            conn.close()
+            break
 
         message_code, message_data = split_message(client_message)
-
-        #if message_code == "LOGIN":
-          #  conn.send(str(Database.login(message_data)).encode())  # TRUE if login successful / False if not
-        #elif message_code == "REGISTER":
-         #   conn.send(str(Database.login(message_data)).encode())  # TRUE if register successful / False if not
-
-        for client in connected_clients:
-            if client is not conn:
-                print(f"[SERVER] {addr[0]}:{str(addr[1])} says {message_data}")
+        print(message_data, message_code)
+        if message_code == "LOGIN":
+            conn.send(str(Database.login(message_data)).encode())  # TRUE if login successful / False if not
+        elif message_code == "REGISTER":
+            conn.send(str(Database.register(message_data)).encode())  # TRUE if register successful / False if not
+        else:
+            for client in connected_clients:
+                if client is not conn:
+                    client.send(message_code.encode())
+                    print(f"[SERVER] {addr[0]}:{str(addr[1])} says {message_data}")
 
 
 
 
 
 def split_message(msg):
-    message_code, message_data = msg.split("|")[0], msg.split("|")[1]
-    return message_code, message_data
+    try:
+        message_code, message_data = msg.split("|")[0], msg.split("|")[1]
+        return message_code, message_data
+    except IndexError:
+        return
 
 
 def main():
