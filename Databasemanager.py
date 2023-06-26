@@ -47,8 +47,9 @@ def register(message_data):
         c.execute("INSERT INTO Accounts VALUES(?, ?, ?, ?)", (username, hashed_password, 0, 0))
         conn.commit()
         conn.close()
-        return True
-    return False
+        return "registration successful"
+    return "registration failed"
+
 
 def login(message_data):
     c,conn = connect_to_database()
@@ -56,7 +57,9 @@ def login(message_data):
     c.execute("SELECT Password FROM Accounts WHERE Username=?", (username,))
     try:
         hashed = c.fetchone()[0]
-        return bcrypt.checkpw(password.encode(), hashed)
+        if (bcrypt.checkpw(password.encode(), hashed)):
+            return True
+        return False
     except TypeError:
         return False
 
